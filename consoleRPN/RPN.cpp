@@ -11,7 +11,7 @@ bool RPN::isDelim(const char c)
 
 bool RPN::isOperator(const char c)
 {
-	return string("+-/*").find(c) != string::npos;
+	return strIsOperator.find(c) != string::npos;
 }
 
 bool RPN::isOperand(const char c)
@@ -21,8 +21,7 @@ bool RPN::isOperand(const char c)
 
 int RPN::getPriority(const char c)
 {
-	string s("()+-*/");
-	return s.find(c) / 2;
+	return strGetPriority.find(c) / 2;
 }
 
 std::string RPN::pop(std::vector<std::string>& operandsStack)
