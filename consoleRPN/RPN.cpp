@@ -42,7 +42,7 @@ double RPN::Count()
 {
 	double d1, d2;
 	vector<double> operandStack;
-	for (string a : output) {
+	for (string& a : output) {
 		if (!isOperator(a[0]) && a[0] != ' ') {
 			operandStack.push_back(stod(a, nullptr));
 		}
@@ -77,7 +77,7 @@ RPN::RPN(const char * input)
 	this->RPN::RPN(string(input));
 }
 
-RPN::RPN(const std::string input)
+RPN::RPN(const std::string& input)
 {
 	for (int i = 0; i < input.length(); i++) {
 		if (isDelim(input[i]))
@@ -99,22 +99,23 @@ RPN::RPN(const std::string input)
 			ops.push_back(input[i]);
 		}
 		else if (input[i] == ')') {
-			char val;
+			char val; 
+			string push;
 			while ((val = ops.back()) != '(')
 			{
 				ops.pop_back();
-				string push;
+				
 				push.push_back(val);
 				output.push_back(push); output.push_back(strSpace);
 			}
 			ops.pop_back();
 		}
 		else if (isOperator(input[i])) {
+			string push;
 			while (ops.size() > 0 && getPriority(ops.back()) >= getPriority(input[i])) {
-				string psh;
-				psh.push_back(ops.back()); ops.pop_back();
-				output.push_back(psh); output.push_back(strSpace);
-				
+				push.push_back(ops.back()); ops.pop_back();
+				output.push_back(push); output.push_back(strSpace);
+				push.clear();
 			}
 			ops.push_back(input[i]);
 		}
@@ -124,14 +125,15 @@ RPN::RPN(const std::string input)
 
 	}
 	if (ops.size() > 0) {
+		string push;
 		for (int i = ops.size() - 1; i >= 0; i--) {
 			char op = ops[i];
-			string push;
 			push.push_back(op);
 			output.push_back(push); output.push_back(strSpace);
+			push.clear();
 		}
 	}
-	for (string a : output) {
+	for (string& a : output) {
 		postfix.append(a);
 	}
 }

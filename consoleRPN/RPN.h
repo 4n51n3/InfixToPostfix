@@ -24,7 +24,7 @@ public:
 
 	double Count();
 	RPN(const char* input);
-	RPN(const std::string input);
+	RPN(const std::string& input);
 	//~RPN();
 };
 
