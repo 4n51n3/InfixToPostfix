@@ -11,7 +11,7 @@ bool RPN::isDelim(const char c)
 
 bool RPN::isOperator(const char c)
 {
-	return strIsOperator.find(c) != string::npos;
+	return strIsBinOperator.find(c) != string::npos;
 }
 
 bool RPN::isOperand(const char c)
@@ -21,13 +21,11 @@ bool RPN::isOperand(const char c)
 
 bool RPN::isUnary(const char c)
 {
-	return c == '-';
+	return strIsUnaryOperator.find(c) != string::npos;
 }
 
 int RPN::getPriority(const char c)
 {
-	if (c == '^')
-		return 3;
 	return strGetPriority.find(c) / 2;
 }
 
@@ -50,36 +48,43 @@ double RPN::Count()
 	double d1, d2;
 	vector<double> operandStack;
 	for (string& a : output) {
-		if (!isOperator(a[0]) && a[0] != ' ' && a[0] != '~') {
+		if (a[0] == ' ')
+			continue;
+		if (!isOperator(a[0]) && a[0] != '~') {
 			operandStack.push_back(stod(a, nullptr));
 		}
-		else if(a[0] != ' ') {
+		else{
+			#pragma region UnaryOperations
 			if (a[0] == '~') {
 				d1 = pop(operandStack);
 				operandStack.push_back(-d1);
 				continue;
 			}
+			#pragma endregion
+
+			#pragma region BinaryOperations
 			d2 = pop(operandStack);
 			d1 = pop(operandStack);
-			
+
 			switch (a[0])
 			{
 			case '+':
-				operandStack.push_back(d1+d2);
+				operandStack.push_back(d1 + d2);
 				break;
 			case '-':
-				operandStack.push_back(d1-d2);
+				operandStack.push_back(d1 - d2);
 				break;
 			case '*':
 				operandStack.push_back(d1*d2);
 				break;
 			case '/':
-				operandStack.push_back(d1/d2);
+				operandStack.push_back(d1 / d2);
 				break;
 			case '^':
-				operandStack.push_back(pow(d1,d2));
+				operandStack.push_back(pow(d1, d2));
 				break;
 			}
+			#pragma endregion
 		}
 	}
 	return pop(operandStack);
@@ -124,16 +129,24 @@ RPN::RPN(const std::string& input)
 			ops.pop_back();
 		}
 		else if (isOperator(input[i])) {
+			#pragma region UnaryParse
 			if (isUnary(input[i])) {
-				// necessary condition
-				if (i == 0 || input[i - 1] == '^') {
-					ops.push_back('~');
+				// If an operator is the first thing in your expression, 
+				// or comes after another operator, or comes after a left 
+				// parenthesis, then it's an unary operator.
 
-					//ops.at(ops.size() + 1) = '-';
-					//ops[ops.size() + 1] = '-';
-					continue;
+				// necessary condition
+				if (i == 0 || isOperator(input[i - 1]) || input[i - 1] == '(') {
+					if (input[i] == '-')
+					{
+						ops.push_back('~');
+						continue;
+					}
 				}
 			}
+			#pragma endregion
+			
+			#pragma region BinaryParse
 			string push;
 			while (ops.size() > 0 && getPriority(ops.back()) >= getPriority(input[i])) {
 				push.push_back(ops.back()); ops.pop_back();
@@ -141,6 +154,7 @@ RPN::RPN(const std::string& input)
 				push.clear();
 			}
 			ops.push_back(input[i]);
+			#pragma endregion
 		}
 		else {
 			throw new exception("Unknown char in input string!");

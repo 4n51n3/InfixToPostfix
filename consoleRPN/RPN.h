@@ -8,8 +8,9 @@ class RPN
 	std::vector<char> ops;
 	std::vector<std::string> output;
 	const std::string strSpace = " ";
-	const std::string strIsOperator = "+-/*^";
-	const std::string strGetPriority = "()+-*/~";
+	const std::string strIsBinOperator = "+-/*^";
+	const std::string strIsUnaryOperator = "~";
+	const std::string strGetPriority = "()+-*/~^";
 
 
 	bool isDelim(const char c);
