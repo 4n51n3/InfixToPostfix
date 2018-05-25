@@ -1,7 +1,7 @@
 #include "RPN.h"
 #include <string>
 #include <vector>
-
+#include <cmath>
 using namespace std;
 
 bool RPN::isDelim(const char c)
@@ -19,8 +19,15 @@ bool RPN::isOperand(const char c)
 	return isdigit(c) || c == '.';
 }
 
+bool RPN::isUnary(const char c)
+{
+	return c == '-';
+}
+
 int RPN::getPriority(const char c)
 {
+	if (c == '^')
+		return 3;
 	return strGetPriority.find(c) / 2;
 }
 
@@ -43,10 +50,15 @@ double RPN::Count()
 	double d1, d2;
 	vector<double> operandStack;
 	for (string& a : output) {
-		if (!isOperator(a[0]) && a[0] != ' ') {
+		if (!isOperator(a[0]) && a[0] != ' ' && a[0] != '~') {
 			operandStack.push_back(stod(a, nullptr));
 		}
 		else if(a[0] != ' ') {
+			if (a[0] == '~') {
+				d1 = pop(operandStack);
+				operandStack.push_back(-d1);
+				continue;
+			}
 			d2 = pop(operandStack);
 			d1 = pop(operandStack);
 			
@@ -64,8 +76,9 @@ double RPN::Count()
 			case '/':
 				operandStack.push_back(d1/d2);
 				break;
-			default:
-				throw new exception("Count() error");
+			case '^':
+				operandStack.push_back(pow(d1,d2));
+				break;
 			}
 		}
 	}
@@ -111,6 +124,16 @@ RPN::RPN(const std::string& input)
 			ops.pop_back();
 		}
 		else if (isOperator(input[i])) {
+			if (isUnary(input[i])) {
+				// necessary condition
+				if (i == 0 || input[i - 1] == '^') {
+					ops.push_back('~');
+
+					//ops.at(ops.size() + 1) = '-';
+					//ops[ops.size() + 1] = '-';
+					continue;
+				}
+			}
 			string push;
 			while (ops.size() > 0 && getPriority(ops.back()) >= getPriority(input[i])) {
 				push.push_back(ops.back()); ops.pop_back();

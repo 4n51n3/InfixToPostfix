@@ -11,6 +11,7 @@ int main(int argc, char** argv) {
 		cout << "Enter infix expression: ";
 		cin >> str;
 		while (cin.get() != '\n') { continue; }
+		
 		try {
 			tmp = new RPN(str);
 			cout << "Rez: " << tmp->Count() << endl << "Postfix form: " << tmp->postfix << endl << endl;
