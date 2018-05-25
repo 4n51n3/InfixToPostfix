@@ -9,7 +9,7 @@ class RPN
 	std::vector<std::string> output;
 	const std::string strSpace = " ";
 	const std::string strIsBinOperator = "+-/*^";
-	const std::string strIsUnaryOperator = "~";
+	const std::string strIsUnaryOperator = "-";
 	const std::string strGetPriority = "()+-*/~^";
 
 
