@@ -122,9 +122,9 @@ RPN::RPN(const std::string& input)
 			while ((val = ops.back()) != '(')
 			{
 				ops.pop_back();
-				
 				push.push_back(val);
 				output.push_back(push); output.push_back(strSpace);
+				push.clear();
 			}
 			ops.pop_back();
 		}
