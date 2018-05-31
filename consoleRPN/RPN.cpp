@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <sstream>
 using namespace std;
 
 bool RPN::isDelim(const char c)
