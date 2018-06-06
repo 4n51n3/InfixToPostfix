@@ -98,6 +98,7 @@ RPN::RPN(const char * input)
 
 RPN::RPN(const std::string& input)
 {
+	stringstream ss;
 	for (int i = 0; i < input.length(); i++) {
 		if (isDelim(input[i]))
 			continue;
@@ -119,13 +120,12 @@ RPN::RPN(const std::string& input)
 		}
 		else if (input[i] == ')') {
 			char val; 
-			string push;
 			while ((val = ops.back()) != '(')
 			{
 				ops.pop_back();
-				push.push_back(val);
-				output.push_back(push); output.push_back(strSpace);
-				push.clear();
+				ss << val;
+				output.push_back(ss.str()); output.push_back(strSpace);
+				ss.str("");
 			}
 			ops.pop_back();
 		}
@@ -148,11 +148,10 @@ RPN::RPN(const std::string& input)
 			#pragma endregion
 			
 			#pragma region BinaryParse
-			string push;
 			while (ops.size() > 0 && getPriority(ops.back()) >= getPriority(input[i])) {
-				push.push_back(ops.back()); ops.pop_back();
-				output.push_back(push); output.push_back(strSpace);
-				push.clear();
+				ss << ops.back(); ops.pop_back();
+				output.push_back(ss.str()); output.push_back(strSpace);
+				ss.str("");
 			}
 			ops.push_back(input[i]);
 			#pragma endregion
@@ -163,12 +162,12 @@ RPN::RPN(const std::string& input)
 
 	}
 	if (ops.size() > 0) {
-		string push;
 		for (int i = ops.size() - 1; i >= 0; i--) {
 			char op = ops[i];
-			push.push_back(op);
-			output.push_back(push); output.push_back(strSpace);
-			push.clear();
+	
+		    ss << op;
+			output.push_back(ss.str()); output.push_back(strSpace);
+			ss.str("");
 		}
 	}
 	for (string& a : output) {
