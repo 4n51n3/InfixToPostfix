@@ -3,6 +3,7 @@
 
 using namespace std;
 int main(int argc, char** argv) {
+	// output.push_back(strSpace); - dont need it
 	//argument as input. Don't forget.
 	string str;
 	RPN* tmp = nullptr;

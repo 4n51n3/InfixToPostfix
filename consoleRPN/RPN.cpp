@@ -1,9 +1,8 @@
 #include "RPN.h"
-#include <string>
-#include <vector>
-#include <cmath>
-#include <sstream>
+
+
 using namespace std;
+typedef unsigned char byte;
 
 bool RPN::isDelim(const char c)
 {
@@ -25,6 +24,52 @@ bool RPN::isUnary(const char c)
 	return strIsUnaryOperator.find(c) != string::npos;
 }
 
+int RPN::parseLogarithm(std::string::const_iterator begin)
+{
+	stringstream ss;
+	byte points = 0;
+	int i = 3;
+	if (*(begin + 1) != 'O' || *(begin + 2) != 'G')
+		throw new exception();
+	auto it = begin + 3;
+	for(; *it != '('; ++it)
+	{
+		i++;
+		if (!isdigit(*it))
+			throw new exception();
+		else {
+			ss << *it;
+		}
+	}
+
+	output.push_back(ss.str()); output.push_back(strSpace);
+	ss.str("");
+	it++;
+	i++;
+	for (; *it != ')'; ++it) {
+		i++;
+		if ( isdigit(*it)){
+			ss << *it;
+			
+		}
+		else if (*it == '.') {
+			points++;
+			if (points > 1)
+				throw new exception();
+		}
+		else{
+			throw new exception();
+		}
+	}
+	i++;
+	output.push_back(ss.str()); output.push_back(strSpace);
+	
+	ss.str("");
+	ss << 'L';
+	output.push_back(ss.str()); output.push_back(strSpace);
+	return i;
+}
+
 int RPN::getPriority(const char c)
 {
 	return strGetPriority.find(c) / 2;
@@ -42,6 +87,11 @@ double RPN::pop(std::vector<double>& operandsStack)
 	double str = operandsStack.back();
 	operandsStack.pop_back();
 	return str;
+}
+
+double RPN::log(double base, double x)
+{
+	return (std::log(x) / std::log(base));
 }
 
 double RPN::Count()
@@ -84,6 +134,8 @@ double RPN::Count()
 			case '^':
 				operandStack.push_back(pow(d1, d2));
 				break;
+			case 'L':
+				operandStack.push_back(RPN::log(d1, d2));
 			}
 			#pragma endregion
 		}
@@ -91,13 +143,12 @@ double RPN::Count()
 	return pop(operandStack);
 }
 
-RPN::RPN(const char * input)
+RPN::RPN(std::string& input)
 {
-	this->RPN::RPN(string(input));
-}
-
-RPN::RPN(const std::string& input)
-{
+	for (char& c : input) {
+		if (isalpha(c))
+			c = toupper(c);
+	}
 	stringstream ss;
 	for (int i = 0; i < input.length(); i++) {
 		if (isDelim(input[i]))
@@ -115,6 +166,10 @@ RPN::RPN(const std::string& input)
 				i--;
 			}
 		#pragma endregion
+		}
+		else if (input[i] == 'L') {
+			int offset = parseLogarithm(input.begin() + i);
+			i += offset - 1;
 		}else if (input[i] == '(') {
 			ops.push_back(input[i]);
 		}
